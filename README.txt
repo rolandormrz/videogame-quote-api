@@ -1,0 +1,1 @@
+A small web API built using Express.js and SQLite. Serves quotes made by popular video game characters.
