@@ -57,7 +57,7 @@ quotesRouter.post('/', (req, res, next) => {
 
         db.get(selectMatchingCharQuote, { $id: this.lastID }, (error, row) => {
           if(error) next(error);
-          
+
           res.status(201).json(row);
         });
       });
@@ -77,6 +77,21 @@ quotesRouter.post('/', (req, res, next) => {
         });
       });
     }
+  });
+});
+
+quotesRouter.put('/:id', (req, res, next) => {
+  const { quote_text, game_title, year } = req.body;
+  const updateQuery = "UPDATE quote SET quote_text = $quote_text, game_title = $game_title, year = $year WHERE id = $id";
+  
+  db.run(updateQuery, { $quote_text: quote_text, $game_title: game_title, $year: year, $id: req.params.id }, function(error) {
+    if(error) next(error);
+
+    db.get("SELECT * FROM quote WHERE id = $id", { $id: req.params.id }, (error, row) => {
+      if(error) next(error);
+
+      res.json(row);
+    });
   });
 });
 
