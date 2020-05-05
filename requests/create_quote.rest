@@ -1,0 +1,9 @@
+POST http://localhost:3001/api/quotes
+Content-Type: application/json
+
+{
+  "name": "Psycho",
+  "text": "I'm gonna beat you to life.",
+  "game_title": "Borderlands 2",
+  "year": "2012"
+}
