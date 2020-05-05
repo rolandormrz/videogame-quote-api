@@ -9,8 +9,21 @@ db.serialize(() => {
   db.run("DROP TABLE IF EXISTS quote");
   
   // create tables
-  db.run('CREATE TABLE character (id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE)');
-  db.run('CREATE TABLE quote (id INTEGER PRIMARY KEY, character_id INTEGER NOT NULL, quote_text TEXT NOT NULL UNIQUE, game_title TEXT NOT NULL, year INTEGER NOT NULL)');
+  db.run(
+    `CREATE TABLE character (
+      id INTEGER PRIMARY KEY,
+      name TEXT NOT NULL UNIQUE
+    )`);
+
+  db.run(
+    `CREATE TABLE quote (
+      id INTEGER PRIMARY KEY,
+      character_id INTEGER NOT NULL,
+      quote_text TEXT NOT NULL UNIQUE,
+      game_title TEXT NOT NULL,
+      year INTEGER NOT NULL,
+      FOREIGN KEY(character_id) REFERENCES character(id)
+    )`);
 
   console.log('successfully created the character and quote tables');
 
