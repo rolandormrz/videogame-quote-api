@@ -1,11 +1,9 @@
 const express = require('express');
 const app = express();
 const quotesRouter = require('./controllers/quotes');
-//const cors = require('cors');
 const middleware = require('./utils/middleware');
-const logger = require('./utils/logger');
 
-//app.use(cors());
+app.use(express.static('public'));
 app.use(express.json());
 app.use(middleware.requestLogger);
 app.use('/api/quotes', quotesRouter);
