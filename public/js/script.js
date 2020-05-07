@@ -10,7 +10,6 @@ const getQuotesByCharacter = character => {
   const quotePath = `${relativeURL}?character=${character}`;
   const request = axios.get(quotePath);
   return request.then(response => {
-    //console.log(response.data);
     return response.data;
   });
 };
@@ -39,7 +38,7 @@ const renderAllQuotes = quotes => {
     });
   }
   else {
-    quoteList.innerHTML = '<p>No quotes returned. Try another request</p>';
+    quoteList.innerHTML = '<p style="padding: 1.1rem; line-height: 28px;">No quotes returned. Try another request</p>';
   }
 };
 
@@ -103,9 +102,14 @@ getQuotesByCharacterBtn.onclick = () => {
       renderAllQuotes(quotes);
     })
     .catch(error => {
-      console.log('rejecting');
-      console.log(error);
-      //console.log(error.response.status, error.response.data);
+      quoteList.innerHTML = `
+        <div class="error">
+          <div class="error-info">
+            <p>An error occurred when attempting your request: </p>
+            <p>Status Code: ${error.response.status}</p>
+            <p>Message: ${error.response.data.error}</p>
+          </div>
+        </div>`;
     });
   
   document.getElementById('character').value = '';
