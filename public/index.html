@@ -2,9 +2,9 @@
 <html>
   <head>
     <title>Videogame Quote API</title>
-    <link href="./reset.css" rel="stylesheet" type="text/css">
-    <link href="./style.css" rel="stylesheet" type="text/css">
-
+    <link href="./css/reset.css" rel="stylesheet" type="text/css">
+    <link href="./css/style.css" rel="stylesheet" type="text/css">
+    <link href="favicon.ico" rel="icon" type="image/x-icon">
   </head>
   <body>
     <header>
@@ -12,26 +12,30 @@
     </header>
     <nav>
       <ul>
-        <li><a href="" >Home</a></li>
-        <li><a href="" >Add New Quote</a></li>
-        <li><a href="" >Update Quote</a></li>
-        <li><a href="" >Delete Quote</a></li>
+        <li><a href="">Home</a></li>
+        <li><a href="">Add New Quote</a></li>
+        <li><a href="">Update Quote</a></li>
+        <li><a href="">Delete Quote</a></li>
       </ul>
     </nav>
     <main>
+      <div id="resource-path">
+        <h2>GET ...</h2>
+      </div>
       <div class="searchbar">
         <div class="input-field" >
           <input id="character" type="text">
         </div>
         <div class="request-option">
-          <button>Get all Quotes</button>
-          <button>Get a Random Quote</button>
-          <button>Get Quotes by Character</button>
+          <button id="get-all">Get all Quotes</button>
+          <button id="get-random">Get a Random Quote</button>
+          <button id="get-by-character">Get Quotes by Character</button>
         </div>
       </div>
-      <div class="quote-list">
-
+      <div id="quote-list">
       </div>
     </main>
   </body>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="./js/script.js"></script>
 </html>
