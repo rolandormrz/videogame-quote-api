@@ -4,11 +4,18 @@ const getRandomQuoteBtn = document.getElementById("get-random");
 const getQuotesByCharacter = document.getElementById("get-by-character");
 const quoteList = document.getElementById("quote-list");
 const resourcePath = document.getElementById('resource-path');
+let prevResourcePath = resourcePath.innerHTML;
 
 const getAllQuotes = () => {
   const request = axios.get(relativeURL);
   return request.then(response => response.data);
 };
+
+const getRandomQuote = () => {
+  const randomQuotePath = `${relativeURL}/random`;
+  const request = axios.get(randomQuotePath);
+  return request.then(response => response.data);
+}
 
 const renderSingleQuote = quote => {
   const newQuote = createQuote(quote.name, quote.quote_text, quote.game_title, quote.year);
@@ -46,19 +53,36 @@ const createQuote = (name, text, gameTitle, year) => {
   return newQuote;  
 }
 
+
 getAllQuotesBtn.onclick = () => {  
   resetQuoteList();
+  prevResourcePath = '<h2>GET /api/quotes</h2>';
   getAllQuotes().then(quotes => renderAllQuotes(quotes));
+};
+
+getAllQuotesBtn.onmouseover = () => {
+  resourcePath.innerHTML = '<h2>GET /api/quotes</h2>';
+};
+
+getAllQuotesBtn.onmouseout = () => {
+  resourcePath.innerHTML = prevResourcePath;
 };
 
 getRandomQuoteBtn.onclick = () => {
   resetQuoteList();
+  prevResourcePath = '<h2>GET /api/quotes/random</h2>';
+  getRandomQuote().then(randomQuote => renderSingleQuote(randomQuote));
+};
 
+getRandomQuoteBtn.onmouseover = () => {
+  resourcePath.innerHTML = '<h2>GET /api/quotes/random</h2>';
+};
 
+getRandomQuoteBtn.onmouseout = () => {
+  resourcePath.innerHTML = prevResourcePath;
 };
 
 getQuotesByCharacter.onclick = () => {
   resetQuoteList();
-
-  console.log('get by character button clicked');
+  
 };
