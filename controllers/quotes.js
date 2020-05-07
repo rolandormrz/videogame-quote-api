@@ -4,11 +4,27 @@ const db = new sqlite3.Database('./videogame_quotes.db');
 const { validId, validName } = require('../utils/validation');
 
 quotesRouter.get('/', (req, res, next) => {
-  db.all('SELECT * FROM Character JOIN Quote ON Character.id = Quote.character_id;', (error, rows) => {
-    if(error) return next(error);
+  if(Object.keys(req.query).length === 0) {
+    db.all('SELECT * FROM Character JOIN Quote ON Character.id = Quote.character_id;', (error, rows) => {
+      if(error) return next(error);
+  
+      res.json(rows);
+    });
+  }
+  else {
+    const name = req.query.character;
+    if(!validName(name)) {
+      return next({ name: 'ValidationError', message: 'name can only contain letters, digits and spaces' });
+    }
 
-    res.json(rows);
-  });
+    const query = "SELECT * FROM character JOIN quote ON character.id = quote.character_id WHERE name = $name;";
+
+    db.all(query, { $name: name }, (error, rows) => {
+      if(error) return next(error);
+
+      res.json(rows);
+    });
+  }
 });
 
 quotesRouter.get('/characters', (req, res, next) => {
@@ -30,15 +46,15 @@ quotesRouter.get('/random', (req, res, next) => {
   });
 });
 
-quotesRouter.get('/:name', (req, res, next) => {
-  const name = req.params.name;
-  if(!validName(name)) {
-    return next({ name: 'ValidationError', message: 'name can only contain letters, digits and spaces' });
+quotesRouter.get('/:id', (req, res, next) => {
+  const id = req.params.id;
+  if(!validId(id)) {
+    return next({ name: 'ValidationError', message: 'id can only contain digits' });
   }
 
-  const query = "SELECT * FROM character JOIN quote ON character.id = quote.character_id WHERE name = $name;";
+  const query = "SELECT * FROM character JOIN quote ON character.id = quote.character_id WHERE quote.id = $id;";
   
-  db.all(query, { $name: name }, (error, rows) => {
+  db.all(query, { $id: id }, (error, rows) => {
     if(error) return next(error);
 
     res.json(rows);

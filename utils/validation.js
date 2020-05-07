@@ -6,8 +6,13 @@ const validId = id => {
 
 // tests if the name contains only letters, digits and " " 
 const validName = name => {
-  const testRegex = /^[A-Za-z0-9\s]+$/;
-  return testRegex.test(name);
+  if(name === '') {
+    return true;
+  }
+  else {
+    const testRegex = /^[A-Za-z0-9\s\-]+$/;
+    return testRegex.test(name);
+  }
 };
 
 module.exports = { validId, validName };

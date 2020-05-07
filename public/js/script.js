@@ -1,10 +1,19 @@
 const relativeURL = '/api/quotes';
 const getAllQuotesBtn = document.getElementById("get-all");
 const getRandomQuoteBtn = document.getElementById("get-random");
-const getQuotesByCharacter = document.getElementById("get-by-character");
+const getQuotesByCharacterBtn = document.getElementById("get-by-character");
 const quoteList = document.getElementById("quote-list");
 const resourcePath = document.getElementById('resource-path');
 let prevResourcePath = resourcePath.innerHTML;
+
+const getQuotesByCharacter = character => {
+  const quotePath = `${relativeURL}?character=${character}`;
+  const request = axios.get(quotePath);
+  return request.then(response => {
+    //console.log(response.data);
+    return response.data;
+  });
+};
 
 const getAllQuotes = () => {
   const request = axios.get(relativeURL);
@@ -82,7 +91,30 @@ getRandomQuoteBtn.onmouseout = () => {
   resourcePath.innerHTML = prevResourcePath;
 };
 
-getQuotesByCharacter.onclick = () => {
+getQuotesByCharacterBtn.onclick = () => {
   resetQuoteList();
   
+  const character = document.getElementById('character').value;
+  console.log(character);
+
+  getQuotesByCharacter(character)
+    .then(quotes => {
+      prevResourcePath = quotes.length ? `<h2>GET /api/quotes?character=${quotes[0].name}</h2>` : `<h2>GET ...</h2>`;
+      renderAllQuotes(quotes);
+    })
+    .catch(error => {
+      console.log('rejecting');
+      console.log(error);
+      //console.log(error.response.status, error.response.data);
+    });
+  
+  document.getElementById('character').value = '';
+};
+
+getQuotesByCharacterBtn.onmouseover = () => {
+  resourcePath.innerHTML = '<h2>GET /api/quotes?character=...</h2>';
+};
+
+getQuotesByCharacterBtn.onmouseout = () => {
+  resourcePath.innerHTML = prevResourcePath;
 };
