@@ -62,21 +62,21 @@ quotesRouter.get('/:id', (req, res, next) => {
 });
 
 quotesRouter.post('/', (req, res, next) => {
-  const { name, text, game_title, year } = req.body;
+  const { name, text, gameTitle, year } = req.body;
 
   if(!validName(name)) {
     return next( { name: 'ValidationError', message: 'name can only contain letters, digits and spaces' })
   }
 
   let selectMatchingCharQuote = "SELECT * FROM character JOIN quote ON character.id = quote.character_id WHERE quote.id = $id;";
-  let insertQuoteQuery = "INSERT INTO quote (character_id, quote_text, game_title, year) VALUES ($id, $text, $game_title, $year);";
+  let insertQuoteQuery = "INSERT INTO quote (character_id, quote_text, game_title, year) VALUES ($id, $text, $gameTitle, $year);";
   
   db.get("SELECT * FROM character WHERE name = $name;", { $name: name }, (error, rowExists) => {
     // problem with query
     if(error) return next(error);
 
     if(rowExists) {
-      db.run(insertQuoteQuery, { $id: rowExists.id, $text: text, $game_title: game_title, $year: year }, function(error) {
+      db.run(insertQuoteQuery, { $id: rowExists.id, $text: text, $gameTitle: gameTitle, $year: year }, function(error) {
         if(error) return next(error);
 
         db.get(selectMatchingCharQuote, { $id: this.lastID }, (error, row) => {
@@ -90,7 +90,7 @@ quotesRouter.post('/', (req, res, next) => {
       db.run("INSERT INTO character (name) VALUES ($name);", { $name: name }, function(error) {
         if(error) return next(error);
 
-        db.run(insertQuoteQuery, { $id: this.lastID, $text: text, $game_title: game_title, $year: year }, function(error) {
+        db.run(insertQuoteQuery, { $id: this.lastID, $text: text, $gameTitle: gameTitle, $year: year }, function(error) {
           if(error) return next(error);
           
           db.get(selectMatchingCharQuote, { $id: this.lastID }, (error, row) => {

@@ -2,7 +2,7 @@ const relativeURL = '/api/quotes';
 const getAllQuotesBtn = document.getElementById("get-all");
 const getRandomQuoteBtn = document.getElementById("get-random");
 const getQuotesByCharacterBtn = document.getElementById("get-by-character");
-const quoteList = document.getElementById("quote-list");
+const quoteContainer = document.getElementById("quote-container");
 const resourcePath = document.getElementById('resource-path');
 let prevResourcePath = resourcePath.innerHTML;
 
@@ -26,27 +26,27 @@ const getRandomQuote = () => {
 }
 
 const renderSingleQuote = quote => {
-  const newQuote = createQuote(quote.name, quote.quote_text, quote.game_title, quote.year);
-  quoteList.appendChild(newQuote);
+  const newQuote = quoteTemplate(quote.name, quote.quote_text, quote.game_title, quote.year);
+  quoteContainer.appendChild(newQuote);
 };
 
 const renderAllQuotes = quotes => {
   if(quotes.length > 0) {
     quotes.forEach(quote => {
-      const newQuote = createQuote(quote.name, quote.quote_text, quote.game_title, quote.year);
-      quoteList.appendChild(newQuote);
+      const newQuote = quoteTemplate(quote.name, quote.quote_text, quote.game_title, quote.year);
+      quoteContainer.appendChild(newQuote);
     });
   }
   else {
-    quoteList.innerHTML = '<p style="padding: 1.1rem; line-height: 28px;">No quotes returned. Try another request</p>';
+    quoteContainer.innerHTML = '<p style="padding: 1.1rem; line-height: 28px;">No quotes returned. Try another request</p>';
   }
 };
 
-const resetQuoteList = () => {
-  quoteList.innerHTML = '';
+const resetQuoteContainer = () => {
+  quoteContainer.innerHTML = '';
 };
 
-const createQuote = (name, text, gameTitle, year) => {
+const quoteTemplate = (name, text, gameTitle, year) => {
   const newQuote = document.createElement('div');
 
   newQuote.className = 'quote';
@@ -59,11 +59,11 @@ const createQuote = (name, text, gameTitle, year) => {
     </div>`;
 
   return newQuote;  
-}
+};
 
 
 getAllQuotesBtn.onclick = () => {  
-  resetQuoteList();
+  resetQuoteContainer();
   prevResourcePath = '<h2>GET /api/quotes</h2>';
   getAllQuotes().then(quotes => renderAllQuotes(quotes));
 };
@@ -77,7 +77,7 @@ getAllQuotesBtn.onmouseout = () => {
 };
 
 getRandomQuoteBtn.onclick = () => {
-  resetQuoteList();
+  resetQuoteContainer();
   prevResourcePath = '<h2>GET /api/quotes/random</h2>';
   getRandomQuote().then(randomQuote => renderSingleQuote(randomQuote));
 };
@@ -91,7 +91,7 @@ getRandomQuoteBtn.onmouseout = () => {
 };
 
 getQuotesByCharacterBtn.onclick = () => {
-  resetQuoteList();
+  resetQuoteContainer();
   
   const character = document.getElementById('character').value;
   console.log(character);
@@ -102,7 +102,7 @@ getQuotesByCharacterBtn.onclick = () => {
       renderAllQuotes(quotes);
     })
     .catch(error => {
-      quoteList.innerHTML = `
+      quoteContainer.innerHTML = `
         <div class="error">
           <div class="error-info">
             <p>An error occurred when attempting your request: </p>

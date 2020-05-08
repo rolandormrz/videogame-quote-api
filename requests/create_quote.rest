@@ -2,8 +2,8 @@ POST http://localhost:3001/api/quotes
 Content-Type: application/json
 
 {
-  "name": "Raiden",
-  "text": "I said my sword is a tool of justice, not used in anger, not drawn in vengeance. But now, I’m not so sure. And besides, this isn’t my sword.",
-  "game_title": "Metal Gear Rising: Revengeance",
-  "year": "2013"
+  "name": "Old Man",
+  "text": "It's dangerous to go alone, take this!",
+  "gameTitle": "The Legend of Zelda",
+  "year": "1986"
 }
