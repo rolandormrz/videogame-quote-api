@@ -23,6 +23,7 @@ const renderSingleQuote = quote => {
 };
 
 const resetFields = () => {
+  document.getElementById('id').value = '';
   document.getElementById('name').value = '';
   document.getElementById('quoteText').value = '';
   document.getElementById('title').value = '';
@@ -32,7 +33,7 @@ const resetFields = () => {
 quoteForm.onsubmit = e => {
   e.preventDefault();
   
-  const { name, quoteText, title, year } = e.target;
+  const { id, name, quoteText, title, year } = e.target;
 
   const newQuote = { 
     name: name.value,
@@ -41,12 +42,14 @@ quoteForm.onsubmit = e => {
     year: year.value  
   };
 
-  axios.post(relativeURL, newQuote)
+  const resourcePath = `${relativeURL}/${id.value}`
+
+  axios.put(resourcePath, newQuote)
     .then(response => {
       console.log(response);
       const success = document.createElement('h3');
       success.style.lineHeight = '28px';
-      success.innerHTML = `Quote was successfully added to the database! Navigate to the home-page to retrieve the quote either by name: ( ${response.data.name} ) or by id: ( ${response.data.quoteId} )!`;
+      success.innerHTML = `The quote located at id: ${response.data.quoteId} has been successfully updated! Below is the updated quote:`;
       quoteContainer.appendChild(success);
 
       renderSingleQuote(response.data);

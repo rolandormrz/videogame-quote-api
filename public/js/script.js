@@ -1,15 +1,25 @@
 const relativeURL = '/api/quotes';
 const getAllQuotesBtn = document.getElementById("get-all");
 const getRandomQuoteBtn = document.getElementById("get-random");
-const getQuotesByCharacterBtn = document.getElementById("get-by-character");
+const getByIdBtn = document.getElementById('get-by-id');
+const getQuotesByNameBtn = document.getElementById("get-by-name");
 const quoteContainer = document.getElementById("quote-container");
 const resourcePath = document.getElementById('resource-path');
 let prevResourcePath = resourcePath.innerHTML;
 
-const getQuotesByCharacter = character => {
-  const quotePath = `${relativeURL}?character=${character}`;
+const getQuotesByName = name => {
+  const quotePath = `${relativeURL}?name=${name}`;
   const request = axios.get(quotePath);
   return request.then(response => {
+    return response.data;
+  });
+};
+
+const getQuoteById = id => {
+  const quotePath = `${relativeURL}/${id}`;
+  const request = axios.get(quotePath);
+  return request.then(response => {
+    console.log(response);
     return response.data;
   });
 };
@@ -26,14 +36,14 @@ const getRandomQuote = () => {
 }
 
 const renderSingleQuote = quote => {
-  const newQuote = quoteTemplate(quote.name, quote.quote_text, quote.game_title, quote.year);
+  const newQuote = quoteTemplate(quote.name, quote.quoteText, quote.title, quote.year);
   quoteContainer.appendChild(newQuote);
 };
 
 const renderAllQuotes = quotes => {
   if(quotes.length > 0) {
     quotes.forEach(quote => {
-      const newQuote = quoteTemplate(quote.name, quote.quote_text, quote.game_title, quote.year);
+      const newQuote = quoteTemplate(quote.name, quote.quoteText, quote.title, quote.year);
       quoteContainer.appendChild(newQuote);
     });
   }
@@ -46,16 +56,16 @@ const resetQuoteContainer = () => {
   quoteContainer.innerHTML = '';
 };
 
-const quoteTemplate = (name, text, gameTitle, year) => {
+const quoteTemplate = (name, quoteText, title, year) => {
   const newQuote = document.createElement('div');
 
   newQuote.className = 'quote';
   newQuote.innerHTML = `
     <div class='quote-text'>
-      <p>${text}</p>
+      <p>${quoteText}</p>
     </div>
     <div class="quote-info">
-      <p>- ${name}, ${gameTitle} ${year}</p>
+      <p>- ${name}, ${title} ${year}</p>
     </div>`;
 
   return newQuote;  
@@ -90,15 +100,14 @@ getRandomQuoteBtn.onmouseout = () => {
   resourcePath.innerHTML = prevResourcePath;
 };
 
-getQuotesByCharacterBtn.onclick = () => {
+getQuotesByNameBtn.onclick = () => {
   resetQuoteContainer();
   
-  const character = document.getElementById('character').value;
-  console.log(character);
+  const name = document.getElementById('input-field').value;
 
-  getQuotesByCharacter(character)
+  getQuotesByName(name)
     .then(quotes => {
-      prevResourcePath = quotes.length ? `<h2>GET /api/quotes?character=${quotes[0].name}</h2>` : `<h2>GET ...</h2>`;
+      prevResourcePath = quotes.length ? `<h2>GET /api/quotes?name=${quotes[0].name}</h2>` : `<h2>GET ...</h2>`;
       renderAllQuotes(quotes);
     })
     .catch(error => {
@@ -112,13 +121,50 @@ getQuotesByCharacterBtn.onclick = () => {
         </div>`;
     });
   
-  document.getElementById('character').value = '';
+  document.getElementById('input-field').value = '';
 };
 
-getQuotesByCharacterBtn.onmouseover = () => {
-  resourcePath.innerHTML = '<h2>GET /api/quotes?character=...</h2>';
+getQuotesByNameBtn.onmouseover = () => {
+  resourcePath.innerHTML = '<h2>GET /api/quotes?name=...</h2>';
 };
 
-getQuotesByCharacterBtn.onmouseout = () => {
+getQuotesByNameBtn.onmouseout = () => {
+  resourcePath.innerHTML = prevResourcePath;
+};
+
+getByIdBtn.onclick = () => {
+  resetQuoteContainer();
+  
+  const id = document.getElementById('input-field').value;
+  
+  if(id) {
+    getQuoteById(id)
+      .then(quote => {
+        prevResourcePath = `<h2>GET /api/quotes/${id}</h2>`;
+        renderSingleQuote(quote);
+      })
+      .catch(error => {
+        quoteContainer.innerHTML = `
+        <div class="error">
+          <div class="error-info">
+            <p>An error occurred when attempting your request: </p>
+            <p>Status Code: ${error.response.status}</p>
+            <p>Message: ${error.response.data.error}</p>
+          </div>
+        </div>`;
+      });
+  }
+  else {
+    quoteContainer.innerHTML = '<p style="padding: 1.1rem; line-height: 28px;">Input field empty. Please specify an ID to attempt the request.</p>';
+  }
+
+  document.getElementById('input-field').value = '';
+};
+
+getByIdBtn.onmouseover = () => {
+  resourcePath.innerHTML = '<h2>GET /api/quotes/...</h2>';
+};
+
+getByIdBtn.onmouseout = () => {
   resourcePath.innerHTML = prevResourcePath;
 };

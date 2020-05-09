@@ -1,1 +1,1 @@
-GET http://localhost:3001/api/quotes/Solid%20Snake
+GET http://localhost:3001/api/quotes?character=Solid%20Snake

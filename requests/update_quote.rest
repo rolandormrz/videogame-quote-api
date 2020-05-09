@@ -1,8 +1,9 @@
-PUT http://localhost:3001/api/quotes/1
+PUT http://localhost:3001/api/quotes/8
 Content-Type: application/json
 
 {
-  "quote_text": "Get over here!",
-  "game_title": "Mortal Kombat",
-  "year": "1998"
+  "name": "Scorpion",
+  "quoteText": "don't get over here!",
+  "title": "Mortal Kombat",
+  "year": "2016"
 }

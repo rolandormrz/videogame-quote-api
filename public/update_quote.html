@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Videogame Quote API - Update Quote</title>
+    <link href="./css/reset.css" rel="stylesheet" type="text/css">
+    <link href="./css/style.css" rel="stylesheet" type="text/css">
+    <link href="favicon.ico" rel="icon" type="image/x-icon">
+  </head>
+  <body>
+    <header>
+      <h1>Videogame Quote API</h1>
+      <nav>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="create_quote.html">Add New Quote</a></li>
+          <li><a href="">Update Quote</a></li>
+          <li><a href="delete_quote.html">Delete Quote</a></li>
+        </ul>
+      </nav>
+    </header>
+    <div id="resource-path">
+      <h2>PUT /api/quotes/...</h2>
+    </div>
+    <form id="quote-form" class="quote-form">
+      <div class="form-fields">
+        <label for="id">ID</label>
+        <input id="id" name="id" value="" type="text" required>
+        <label for="name">Name</label>
+        <input id="name" name="name" value="" type="text" required>
+        <label for="quoteText">Quote Text</label>
+        <input id="quoteText" name="quoteText" value="" type="text" required>
+        <label for="title">Game Title</label>
+        <input id="title" name="title" value="" type="text" required>
+        <label for="year">Year</label>
+        <input id="year" name="year" value="" type="text" required>
+      </div>
+      <button id="submit-button" class="submit-button">Send PUT Request</button>
+    </form>
+    <div id="quote-container">
+    </div>
+  </body>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="./js/update_quote.js"></script>
+</html>

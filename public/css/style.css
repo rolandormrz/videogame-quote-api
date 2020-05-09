@@ -100,11 +100,8 @@ h2 {
   align-items: center;
 }
 
-.input-field {
+input.input-field{
   margin: 1rem 0rem;
-}
-
-.input-field > input {
   font-size: 1rem;
   background-color: #FFFFFF;
   width: 18.5rem;
@@ -184,7 +181,7 @@ h2 {
   padding: 1.5rem;
 }
 
-.create-quote-form {
+.quote-form {
   display: flex;
   flex-direction: column;
   align-items: center;

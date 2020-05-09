@@ -5,23 +5,25 @@ const { validId, validName } = require('../utils/validation');
 
 quotesRouter.get('/', (req, res, next) => {
   if(Object.keys(req.query).length === 0) {
-    db.all('SELECT * FROM Character JOIN Quote ON Character.id = Quote.character_id;', (error, rows) => {
+    const query = 'SELECT * FROM game JOIN character ON game.gameId = character.gameID JOIN quote ON quote.characterId = character.characterId;';
+
+    db.all(query, (error, rows) => {
       if(error) return next(error);
   
       res.json(rows);
     });
   }
   else {
-    const name = req.query.character;
+    const name = req.query.name;
     if(!validName(name)) {
       return next({ name: 'ValidationError', message: 'name can only contain letters, digits and spaces' });
     }
 
-    const query = "SELECT * FROM character JOIN quote ON character.id = quote.character_id WHERE name = $name;";
+    const query = 'SELECT * FROM game JOIN character on game.gameId = character.gameID JOIN quote ON quote.characterId = character.characterId WHERE LOWER(name) LIKE LOWER($name);';
 
     db.all(query, { $name: name }, (error, rows) => {
       if(error) return next(error);
-
+      console.log(rows);
       res.json(rows);
     });
   }
@@ -36,7 +38,8 @@ quotesRouter.get('/characters', (req, res, next) => {
 });
 
 quotesRouter.get('/random', (req, res, next) => {
-  db.all('SELECT * FROM Character JOIN Quote ON Character.id = Quote.character_id;', (error, rows) => {
+  const query = 'SELECT * FROM game JOIN character on game.gameId = character.gameID JOIN quote ON quote.characterId = character.characterId;';
+  db.all(query, (error, rows) => {
     if(error) return next(error);
 
     const randomIndex = Math.floor(Math.random() * rows.length);
@@ -48,56 +51,91 @@ quotesRouter.get('/random', (req, res, next) => {
 
 quotesRouter.get('/:id', (req, res, next) => {
   const id = req.params.id;
+
   if(!validId(id)) {
     return next({ name: 'ValidationError', message: 'id can only contain digits' });
   }
 
-  const query = "SELECT * FROM character JOIN quote ON character.id = quote.character_id WHERE quote.id = $id;";
-  
-  db.all(query, { $id: id }, (error, rows) => {
+  db.get("SELECT * FROM quote where quoteId = $id;", { $id: id}, (error, row) => {
     if(error) return next(error);
 
-    res.json(rows);
+    if(row) {
+      const query = 'SELECT * FROM game JOIN character on game.gameId = character.gameID JOIN quote ON quote.characterId = character.characterId WHERE quote.quoteId = $id;';
+      
+      db.get(query, { $id: id }, (error, row) => {
+        if(error) return next(error);
+        console.log('the result of performing the query', row);
+        res.json(row);
+      });
+    }
+    else {
+      return next({ name: 'NotFound', message: 'no resource matching that id exists, unable to perform request' });
+    }
   });
 });
 
 quotesRouter.post('/', (req, res, next) => {
-  const { name, text, gameTitle, year } = req.body;
+  const { name, quoteText, title, year } = req.body;
 
-  if(!validName(name)) {
-    return next( { name: 'ValidationError', message: 'name can only contain letters, digits and spaces' })
+  if(!name || !quoteText || !title || !year) {
+    return next({ name: 'MissingProperties', message: 'missing properties' });
   }
 
-  let selectMatchingCharQuote = "SELECT * FROM character JOIN quote ON character.id = quote.character_id WHERE quote.id = $id;";
-  let insertQuoteQuery = "INSERT INTO quote (character_id, quote_text, game_title, year) VALUES ($id, $text, $gameTitle, $year);";
-  
-  db.get("SELECT * FROM character WHERE name = $name;", { $name: name }, (error, rowExists) => {
-    // problem with query
+  if(!validName(name)) {
+    return next( { name: 'ValidationError', message: 'name can only contain letters, digits and spaces' });
+  }
+
+  db.get('SELECT * FROM game WHERE title = $title', { $title : title }, (error, gameRow) => {
     if(error) return next(error);
 
-    if(rowExists) {
-      db.run(insertQuoteQuery, { $id: rowExists.id, $text: text, $gameTitle: gameTitle, $year: year }, function(error) {
+    if(gameRow) {
+      db.get('SELECT * FROM game JOIN character ON $gameId = character.gameId WHERE character.name = $name', { $gameId: gameRow.gameId, $name: name }, (error, charRow) => {
         if(error) return next(error);
 
-        db.get(selectMatchingCharQuote, { $id: this.lastID }, (error, row) => {
-          if(error) return next(error);
+        if(charRow) {
+          db.run('INSERT INTO quote (characterId, quoteText, year) VALUES ($characterId, $quoteText, $year);', { $characterId: charRow.characterId, $quoteText: quoteText, $year: year }, function(error) {
+            if(error) return next(error);
 
-          res.status(201).json(row);
-        });
+            db.get('SELECT * FROM game JOIN character on game.gameId = character.gameID JOIN quote ON quote.characterId = character.characterId WHERE quote.quoteId = $quoteId;', { $quoteId: this.lastID }, (error, row) => {
+              if(error) return next(error);
+
+              res.status(201).json(row);
+            });
+          });
+        }
+        else {
+          db.run('INSERT INTO character (gameId, name) VALUES ($gameId, $name);', { $gameId: gameRow.gameId, $name: name }, function(error) {
+            if(error) return next(error);
+  
+            db.run('INSERT INTO quote (characterId, quoteText, year) VALUES ($characterId, $quoteText, $year);', { $characterId: this.lastID, $quoteText: quoteText, $year: year }, function(error) {
+              if(error) return next(error);
+  
+              db.get('SELECT * FROM game JOIN character on game.gameId = character.gameID JOIN quote ON quote.characterId = character.characterId WHERE quote.quoteId = $quoteId;', { $quoteId: this.lastID }, (error, row) => {
+                if(error) return next(error);
+  
+                res.status(201).json(row);
+              });
+            }); 
+          });
+        }
       });
     }
     else {
-      db.run("INSERT INTO character (name) VALUES ($name);", { $name: name }, function(error) {
+      db.run('INSERT INTO game (title) VALUES ($title);', { $title: title}, function(error) {
         if(error) return next(error);
 
-        db.run(insertQuoteQuery, { $id: this.lastID, $text: text, $gameTitle: gameTitle, $year: year }, function(error) {
+        db.run('INSERT INTO character (gameId, name) VALUES ($gameId, $name);', { $gameId: this.lastID, $name: name }, function(error) {
           if(error) return next(error);
-          
-          db.get(selectMatchingCharQuote, { $id: this.lastID }, (error, row) => {
+
+          db.run('INSERT INTO quote (characterId, quoteText, year) VALUES ($characterId, $quoteText, $year);', { $characterId: this.lastID, $quoteText: quoteText, $year: year }, function(error) {
             if(error) return next(error);
 
-            res.status(201).json(row);
-          });
+            db.get('SELECT * FROM game JOIN character on game.gameId = character.gameID JOIN quote ON quote.characterId = character.characterId WHERE quote.quoteId = $quoteId;', { $quoteId: this.lastID }, (error, row) => {
+              if(error) return next(error);
+
+              res.status(201).json(row);
+            });
+          }); 
         });
       });
     }
@@ -105,35 +143,106 @@ quotesRouter.post('/', (req, res, next) => {
 });
 
 quotesRouter.put('/:id', (req, res, next) => {
-  if(!validId(req.params.id)) {
+  const id = req.params.id;
+  const { name, quoteText, title, year } = req.body;
+
+  if(!name || !quoteText || !title || !year) {
+    return next({ name: 'MissingProperties', message: 'missing properties' });
+  }
+
+  if(!validId(id)) {
     return next({ name: 'ValidationError', message: 'id can only contain digits' });
   }
 
-  const { quote_text, game_title, year } = req.body;
-  console.log(typeof req.params.id);
-  const updateQuery = "UPDATE quote SET quote_text = $quote_text, game_title = $game_title, year = $year WHERE id = $id;";
+  if(!validName(name)) {
+    return next( { name: 'ValidationError', message: 'name can only contain letters, digits and spaces' });
+  }
   
-  db.run(updateQuery, { $quote_text: quote_text, $game_title: game_title, $year: year, $id: req.params.id }, function(error) {
+  db.get('SELECT * FROM game JOIN character ON game.gameId = character.gameID JOIN quote ON quote.characterId = character.characterId WHERE quote.quoteId = $quoteId;', { $quoteId: id }, (error, row) => {
     if(error) return next(error);
 
-    db.get("SELECT * FROM quote WHERE id = $id;", { $id: req.params.id }, (error, row) => {
-      if(error) return next(error);
-
-      res.json(row);
-    });
+    if(row) {
+      db.get('SELECT * FROM game WHERE title = $title', { $title : title }, (error, gameRow) => {
+        if(error) return next(error);
+    
+        if(gameRow) {
+          db.get('SELECT * FROM game JOIN character ON $gameId = character.gameId WHERE character.name = $name', { $gameId: gameRow.gameId, $name: name }, (error, charRow) => {
+            if(error) return next(error);
+    
+            if(charRow) {
+              db.run("UPDATE quote SET characterId = $characterId, quoteText = $quoteText, year = $year WHERE quoteId = $quoteId;", { $characterId: charRow.characterId, $quoteText: quoteText, $quoteId: id, $year: year }, function(error) {
+                if(error) return next(error);
+    
+                db.get('SELECT * FROM game JOIN character on game.gameId = character.gameID JOIN quote ON quote.characterId = character.characterId WHERE quote.quoteId = $quoteId;', { $quoteId: id }, (error, row) => {
+                  if(error) return next(error);
+    
+                  res.json(row);
+                });
+              }); 
+            }
+            else {
+              db.run('INSERT INTO character (gameId, name) VALUES ($gameId, $name);', { $gameId: gameRow.gameId, $name: name }, function(error) {
+                if(error) return next(error);
+                
+                db.run("UPDATE quote SET characterId = $characterId, quoteText = $quoteText, year = $year WHERE quoteId = $quoteId;", { $characterId: this.lastID, $quoteText: quoteText, $quoteId: id, $year: year }, function(error) {
+                  if(error) return next(error);
+      
+                  db.get('SELECT * FROM game JOIN character on game.gameId = character.gameID JOIN quote ON quote.characterId = character.characterId WHERE quote.quoteId = $quoteId;', { $quoteId: id }, (error, row) => {
+                    if(error) return next(error);
+      
+                    res.json(row);
+                  });
+                }); 
+              });
+            }
+          });
+        }
+        else {
+          db.run('INSERT INTO game (title) VALUES ($title);', { $title: title }, function(error) {
+            if(error) return next(error);
+    
+            db.run('INSERT INTO character (gameId, name) VALUES ($gameId, $name);', { $gameId: this.lastID, $name: name }, function(error) {
+              if(error) return next(error);
+    
+              db.run("UPDATE quote SET characterId = $characterId, quoteText = $quoteText, year = $year WHERE quoteId = $quoteId;", { $characterId: this.lastID, $quoteText: quoteText, $quoteId: id, $year: year }, function(error) {
+                if(error) return next(error);
+    
+                db.get('SELECT * FROM game JOIN character on game.gameId = character.gameID JOIN quote ON quote.characterId = character.characterId WHERE quote.quoteId = $quoteId;', { $quoteId: id }, (error, row) => {
+                  if(error) return next(error);
+    
+                  res.json(row);
+                });
+              }); 
+            });
+          });
+        }
+      });
+    }
+    else {
+      return next({ name: 'NotFound', message: 'no resource matching that id exists, unable to perform request' });
+    }
   });
 });
 
 quotesRouter.delete('/:id', (req, res, next) => {
-  if(!validId(req.params.id)) {
+  const id = req.params.id;
+  if(!validId(id)) {
     return next({ name: 'ValidationError', message: 'id can only contain digits' });
   }
 
-  const deleteQuery = "DELETE FROM quote WHERE id = $id;";
-  db.run(deleteQuery, { $id: req.params.id }, function(error) {
+  db.get("SELECT * FROM quote where quoteId = $id;", { $id: id}, (error, row) => {
     if(error) return next(error);
 
-    res.status(204).end();
+    if(row) {
+      db.run("DELETE FROM quote WHERE quoteId = $id;", { $id: id }, function(error) {
+        if(error) return next(error);
+    
+        res.status(204).end();
+      });
+    }
+    else {
+      return next({ name: 'NotFound', message: 'no resource matching that id exists, unable to perform request' });
+    }
   });
 });
 

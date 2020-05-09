@@ -13,8 +13,8 @@
         <ul>
           <li><a href="index.html">Home</a></li>
           <li><a href="">Add New Quote</a></li>
-          <li><a href="">Update Quote</a></li>
-          <li><a href="">Delete Quote</a></li>
+          <li><a href="update_quote.html">Update Quote</a></li>
+          <li><a href="delete_quote.html">Delete Quote</a></li>
         </ul>
       </nav>
     </header>
@@ -22,14 +22,14 @@
       <div id="resource-path">
         <h2>POST /api/quotes</h2>
       </div>
-      <form id="create-quote-form" class="create-quote-form">
+      <form id="quote-form" class="quote-form">
         <div class="form-fields">
           <label for="name">Name</label>
           <input id="name" name="name" value="" type="text" required>
-          <label for="text">Quote Text</label>
-          <input id="text" name="text" value="" type="text" required>
-          <label for="gameTitle">Game Title</label>
-          <input id="gameTitle" name="gameTitle" value="" type="text" required>
+          <label for="quoteText">Quote Text</label>
+          <input id="quoteText" name="quoteText" value="" type="text" required>
+          <label for="title">Game Title</label>
+          <input id="title" name="title" value="" type="text" required>
           <label for="year">Year</label>
           <input id="year" name="year" value="" type="text" required>
         </div>

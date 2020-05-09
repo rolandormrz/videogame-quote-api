@@ -20,6 +20,12 @@ const errorHandler = (error, req, res, next) => {
   else if(error.code === 'SQLITE_CONSTRAINT') {
     return res.status(400).json(error);
   }
+  else if(error.name === 'NotFound') {
+    return res.status(404).json({ error: error.message });
+  }
+  else if(error.name === 'MissingProperties') {
+    return res.status(400).json({ error: error.message });
+  }
 
   return res.status(500).json(error);
 };

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Videogame Quote API</title>
+    <title>Videogame Quote API - Delete Quote</title>
     <link href="./css/reset.css" rel="stylesheet" type="text/css">
     <link href="./css/style.css" rel="stylesheet" type="text/css">
     <link href="favicon.ico" rel="icon" type="image/x-icon">
@@ -11,30 +11,28 @@
       <h1>Videogame Quote API</h1>
       <nav>
         <ul>
-          <li><a href="">Home</a></li>
+          <li><a href="index.html">Home</a></li>
           <li><a href="create_quote.html">Add New Quote</a></li>
           <li><a href="update_quote.html">Update Quote</a></li>
-          <li><a href="delete_quote.html">Delete Quote</a></li>
+          <li><a href="">Delete Quote</a></li>
         </ul>
       </nav>
     </header>
     <main>
       <div id="resource-path">
-        <h2>GET ...</h2>
+        <h2>DELETE /api/quotes/...</h2>
       </div>
-      <div class="searchbar">
-        <input id="input-field" class="input-field" name="input-field" value="" type="text">
-        <div class="request-option">
-          <button id="get-all">Get all Quotes</button>
-          <button id="get-random">Get a Random Quote</button>
-          <button id="get-by-name">Get Quotes by Character</button>
-          <button id="get-by-id">Get by ID</button>
+      <form id="quote-form" class="quote-form">
+        <div class="form-fields">
+          <label for="id">ID</label>
+          <input id="id" name="id" value="" type="text" required>
         </div>
-      </div>
+        <button id="submit-button" class="submit-button">Send DELETE Request</button>
+      </form>
       <div id="quote-container">
       </div>
     </main>
   </body>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <script src="./js/script.js"></script>
+  <script src="./js/delete_quote.js"></script>
 </html>
