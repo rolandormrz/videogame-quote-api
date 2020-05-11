@@ -82,14 +82,22 @@ main h2 {
 }
 
 .input-field{
-  margin: 1rem 0rem;
   font-size: 1rem;
   background-color: #FFFFFF;
-  width: 18.5rem;
+  margin: .8rem;
+  width: 22.5rem;
   height: 1.6rem;
-  padding: .2rem;
+  padding: .3rem;
   border: 0;
   border-radius: 1px;
+}
+
+textarea.input-field {
+  padding-top: .5rem;
+  min-width: 22.5rem;
+  max-width: 22.5rem;
+  min-height: 1.6rem;
+  max-height: 3.2rem;
 }
 
 .request-option {
@@ -192,17 +200,6 @@ main h2 {
 .form-fields {
   display: flex;
   flex-direction: column;
-}
-
-.form-fields input {
-  font-size: 1rem;
-  background-color: #FFFFFF;
-  margin: .8rem;
-  width: 22.5rem;
-  height: 1.6rem;
-  padding: .2rem;
-  border: 0;
-  border-radius: 1px;
 }
 
 #load-more {
