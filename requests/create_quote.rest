@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
   "name": "Old Man",
-  "quoteText": "Go alone, it's not dangerous!",
+  "quoteText": "It's dangerous to go alone, take this!",
   "title": "The Legend of Zelda",
   "year": "1986"
 }

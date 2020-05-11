@@ -4,58 +4,67 @@ const getRandomQuoteBtn = document.getElementById("get-random");
 const getByIdBtn = document.getElementById('get-by-id');
 const getQuotesByNameBtn = document.getElementById("get-by-name");
 const quoteContainer = document.getElementById("quote-container");
-const resourcePath = document.getElementById('resource-path');
+const resourcePath = document.getElementById('resource-path-display');
 let prevResourcePath = resourcePath.innerHTML;
 
-const getQuotesByName = name => {
-  const quotePath = `${relativeURL}?name=${name}`;
-  const request = axios.get(quotePath);
-  return request.then(response => {
-    return response.data;
-  });
+const loadMoreBtn = document.getElementById("load-more");
+
+let quotesArray = [];
+let quotesToShowOnClick = 5;
+let lastDisplayedQuote = 0;
+
+const load = () => {
+  for(let i = lastDisplayedQuote; i < lastDisplayedQuote + quotesToShowOnClick; i++) {
+    if(i >= quotesArray.length) {
+
+      loadMoreBtn.style.visibility = 'hidden';
+      break;
+    }
+
+    quoteContainer.appendChild(quotesArray[i]);
+  }
+  
+  lastDisplayedQuote += quotesToShowOnClick;
+
+  if(lastDisplayedQuote >= quotesArray.length) {
+    loadMoreBtn.style.visibility = 'hidden';
+  }
 };
 
-const getQuoteById = id => {
-  const quotePath = `${relativeURL}/${id}`;
-  const request = axios.get(quotePath);
-  return request.then(response => {
-    console.log(response);
-    return response.data;
-  });
-};
-
-const getAllQuotes = () => {
-  const request = axios.get(relativeURL);
-  return request.then(response => response.data);
-};
-
-const getRandomQuote = () => {
-  const randomQuotePath = `${relativeURL}/random`;
-  const request = axios.get(randomQuotePath);
-  return request.then(response => response.data);
-}
+loadMoreBtn.onclick = load;
 
 const renderSingleQuote = quote => {
   const newQuote = quoteTemplate(quote.name, quote.quoteText, quote.title, quote.year);
   quoteContainer.appendChild(newQuote);
 };
 
-const renderAllQuotes = quotes => {
+
+const renderQuotes = quotes => {
   if(quotes.length > 0) {
-    quotes.forEach(quote => {
-      const newQuote = quoteTemplate(quote.name, quote.quoteText, quote.title, quote.year);
-      quoteContainer.appendChild(newQuote);
-    });
+    if(quotes.length <= 10) {
+      quotes.forEach(quote => quoteContainer.appendChild(quote));
+    }
+    else {
+      let i = 0;
+      while(i < 10) {
+        quoteContainer.appendChild(quotes[i]);
+        i++;
+      }
+      lastDisplayedQuote = i;
+      loadMoreBtn.style.visibility = 'visible';
+    }
   }
   else {
     quoteContainer.innerHTML = '<p style="padding: 1.1rem; line-height: 28px;">No quotes returned. Try another request</p>';
   }
-};
+}
 
 const resetQuoteContainer = () => {
   quoteContainer.innerHTML = '';
+  loadMoreBtn.style.visibility = 'hidden';
 };
 
+// --- reusable templates for rendering quotes and error messages ---
 const quoteTemplate = (name, quoteText, title, year) => {
   const newQuote = document.createElement('div');
 
@@ -71,88 +80,65 @@ const quoteTemplate = (name, quoteText, title, year) => {
   return newQuote;  
 };
 
+const errorTemplate = (status, message) => {
+  return `<div class="error">
+          <div class="error-info">
+            <p>An error occurred when attempting your request: </p>
+            <p>Status Code: ${status}</p>
+            <p>Message: ${message}</p>
+          </div>
+        </div>`;
+};
 
+// --- set onclick handlers for all four buttons ---
 getAllQuotesBtn.onclick = () => {  
   resetQuoteContainer();
   prevResourcePath = '<h2>GET /api/quotes</h2>';
-  getAllQuotes().then(quotes => renderAllQuotes(quotes));
-};
 
-getAllQuotesBtn.onmouseover = () => {
-  resourcePath.innerHTML = '<h2>GET /api/quotes</h2>';
-};
-
-getAllQuotesBtn.onmouseout = () => {
-  resourcePath.innerHTML = prevResourcePath;
+  axios.get(relativeURL).then(response => {
+    quotesArray = response.data.map(quote => quoteTemplate(quote.name, quote.quoteText, quote.title, quote.year));
+    
+    renderQuotes(quotesArray);
+  });
 };
 
 getRandomQuoteBtn.onclick = () => {
   resetQuoteContainer();
+  const randomQuotePath = `${relativeURL}/random`;
   prevResourcePath = '<h2>GET /api/quotes/random</h2>';
-  getRandomQuote().then(randomQuote => renderSingleQuote(randomQuote));
-};
-
-getRandomQuoteBtn.onmouseover = () => {
-  resourcePath.innerHTML = '<h2>GET /api/quotes/random</h2>';
-};
-
-getRandomQuoteBtn.onmouseout = () => {
-  resourcePath.innerHTML = prevResourcePath;
+  axios.get(randomQuotePath).then(response => renderSingleQuote(response.data));
 };
 
 getQuotesByNameBtn.onclick = () => {
   resetQuoteContainer();
   
   const name = document.getElementById('input-field').value;
+  const quotePath = `${relativeURL}?name=${name}`;
 
-  getQuotesByName(name)
-    .then(quotes => {
-      prevResourcePath = quotes.length ? `<h2>GET /api/quotes?name=${quotes[0].name}</h2>` : `<h2>GET ...</h2>`;
-      renderAllQuotes(quotes);
+  axios.get(quotePath)
+    .then(response => {
+      prevResourcePath = response.data.length ? `<h2>GET /api/quotes?name=${response.data[0].name}</h2>` : `<h2>GET ...</h2>`;
+      quotesArray = response.data.map(quote => quoteTemplate(quote.name, quote.quoteText, quote.title, quote.year));
+      renderQuotes(quotesArray);
     })
-    .catch(error => {
-      quoteContainer.innerHTML = `
-        <div class="error">
-          <div class="error-info">
-            <p>An error occurred when attempting your request: </p>
-            <p>Status Code: ${error.response.status}</p>
-            <p>Message: ${error.response.data.error}</p>
-          </div>
-        </div>`;
-    });
+    .catch(error => quoteContainer.innerHTML = errorTemplate(error.response.status, error.response.data.error));
   
   document.getElementById('input-field').value = '';
-};
-
-getQuotesByNameBtn.onmouseover = () => {
-  resourcePath.innerHTML = '<h2>GET /api/quotes?name=...</h2>';
-};
-
-getQuotesByNameBtn.onmouseout = () => {
-  resourcePath.innerHTML = prevResourcePath;
 };
 
 getByIdBtn.onclick = () => {
   resetQuoteContainer();
   
   const id = document.getElementById('input-field').value;
-  
+  const quotePath = `${relativeURL}/${id}`;
+
   if(id) {
-    getQuoteById(id)
-      .then(quote => {
+    axios.get(quotePath)
+      .then(response => {
         prevResourcePath = `<h2>GET /api/quotes/${id}</h2>`;
-        renderSingleQuote(quote);
+        renderSingleQuote(response.data);
       })
-      .catch(error => {
-        quoteContainer.innerHTML = `
-        <div class="error">
-          <div class="error-info">
-            <p>An error occurred when attempting your request: </p>
-            <p>Status Code: ${error.response.status}</p>
-            <p>Message: ${error.response.data.error}</p>
-          </div>
-        </div>`;
-      });
+      .catch(error => quoteContainer.innerHTML = errorTemplate(error.response.status, error.response.data.error));
   }
   else {
     quoteContainer.innerHTML = '<p style="padding: 1.1rem; line-height: 28px;">Input field empty. Please specify an ID to attempt the request.</p>';
@@ -161,10 +147,13 @@ getByIdBtn.onclick = () => {
   document.getElementById('input-field').value = '';
 };
 
-getByIdBtn.onmouseover = () => {
-  resourcePath.innerHTML = '<h2>GET /api/quotes/...</h2>';
+// --- sets up the resource-path-display container to render the resource path used when the mouse hovers over a button ---
+const setResourcePathDisplay = (button, text) => {
+  button.onmouseover = () => resourcePath.innerHTML = `<h2>${text}</h2>`;
+  button.onmouseout = () => resourcePath.innerHTML = prevResourcePath;
 };
 
-getByIdBtn.onmouseout = () => {
-  resourcePath.innerHTML = prevResourcePath;
-};
+setResourcePathDisplay(getAllQuotesBtn, 'GET /api/quotes');
+setResourcePathDisplay(getRandomQuoteBtn, 'GET /api/quotes/random');
+setResourcePathDisplay(getQuotesByNameBtn, 'GET /api/quotes?name=...');
+setResourcePathDisplay(getByIdBtn, 'GET /api/quotes/...');

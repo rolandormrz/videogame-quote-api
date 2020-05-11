@@ -11,7 +11,7 @@
       <h1>Videogame Quote API</h1>
       <nav>
         <ul>
-          <li><a href="">Home</a></li>
+          <li><a href="">Get Quotes</a></li>
           <li><a href="create_quote.html">Add New Quote</a></li>
           <li><a href="update_quote.html">Update Quote</a></li>
           <li><a href="delete_quote.html">Delete Quote</a></li>
@@ -19,20 +19,25 @@
       </nav>
     </header>
     <main>
-      <div id="resource-path">
+      <div id="resource-path-display">
         <h2>GET ...</h2>
       </div>
       <div class="searchbar">
         <input id="input-field" class="input-field" name="input-field" value="" type="text">
         <div class="request-option">
-          <button id="get-all">Get all Quotes</button>
-          <button id="get-random">Get a Random Quote</button>
-          <button id="get-by-name">Get Quotes by Character</button>
-          <button id="get-by-id">Get by ID</button>
+          <div class="button-container">
+            <button id="get-all" class="button-styling">Get all Quotes</button>
+            <button id="get-random" class="button-styling">Get a Random Quote</button>
+          </div>
+          <div class="button-container">
+            <button id="get-by-name" class="button-styling">Get Quotes by Character</button>
+            <button id="get-by-id" class="button-styling">Get by ID</button>
+          </div>
         </div>
       </div>
       <div id="quote-container">
       </div>
+      <button id="load-more" class="button-styling">Load More</button>
     </main>
   </body>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>

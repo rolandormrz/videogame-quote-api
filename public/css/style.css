@@ -1,32 +1,13 @@
 /* Universal Styles */
-
 html {
   font-size: 18px;
   background-color: #F5F5F5;
 }
 
-@media only screen and (max-width: 597px) {
+@media only screen and (max-width: 771px) {
   html {
     font-size: 15px;
   }
-}
-
-input:focus {
-  outline: none;
-}
-
-/* Reusable Component - Image Container */
-
-.image-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  overflow: hidden;
-  background: #000;
-}
-
-.image-container img {
-  width: 100%;
 }
 
 /* Quote Api Styling */
@@ -53,20 +34,20 @@ header > h1 {
   letter-spacing: 2px;
   font-size: 1.8rem;
   font-weight: bold;
-  margin: 2.5rem 0 1.5rem 0;
+  margin: 3.5rem 0 1.5rem 0;
 }
 
 nav {
   margin: 1rem 0rem;
 }
 
-nav > ul > li {
+nav li {
   display: inline;
   margin-right: 1rem;
   letter-spacing: 1px;
 }
 
-nav > ul > li:last-child {
+nav li:last-child {
   margin-right: 0rem;
 }
 
@@ -85,7 +66,7 @@ main {
   width: 100%;
 }
 
-h2 {
+main h2 {
   color: #141c3a;
   letter-spacing: 2px;
   font-size: 1.5rem;
@@ -100,7 +81,7 @@ h2 {
   align-items: center;
 }
 
-input.input-field{
+.input-field{
   margin: 1rem 0rem;
   font-size: 1rem;
   background-color: #FFFFFF;
@@ -111,7 +92,20 @@ input.input-field{
   border-radius: 1px;
 }
 
-.request-option > button {
+.request-option {
+  display: flex;
+}
+
+.button-container {
+  display: flex;
+  margin-right: .5rem;
+}
+
+.button-container button:last-child {
+  margin-right: 0rem;
+}
+
+.button-styling {
   margin: .5rem 0rem;
   margin-right:.5rem;
   padding: .5rem;
@@ -123,17 +117,24 @@ input.input-field{
   border-radius: 1px;
 }
 
-.request-option > button:last-child {
-  margin-right: 0rem;
-}
-
-.request-option > button:hover {
+.button-styling:hover {
   background-color: #fd4c3fc5;
   transition: background-color 0.2s;
 }
 
-.request-option > button:focus {
+.button-styling:focus {
   outline-color: #fd4c3fe3;
+}
+
+@media only screen and (max-width: 771px) {
+  .request-option {
+    flex-direction: column;
+  }
+
+  .button-container {
+    justify-content: space-between;
+    margin-right: 0rem;
+  }
 }
 
 #quote-container {
@@ -141,7 +142,7 @@ input.input-field{
   flex-direction: column;
   width: 62%;
   margin-top: 1rem;
-  margin-bottom: 4.5rem;
+  margin-bottom: 1.5rem;
 }
 
 #quote-container > h3 {
@@ -188,33 +189,12 @@ input.input-field{
   margin: 1rem;
 }
 
-.submit-button {
-  margin-top: 1.5rem;
-  padding: .5rem;
-  font-size: 1.1rem;
-  color: #FFFFFF;
-  background-color: #fd4d3f;
-  width: 50%;
-  cursor: pointer;
-  border: 0;
-  border-radius: 1px;
-}
-
-.submit-button:hover {
-  background-color: #fd4c3fc5;
-  transition: background-color 0.2s;
-}
-
-.submit-button:focus {
-  outline-color: #fd4c3fe3;
-}
-
 .form-fields {
   display: flex;
   flex-direction: column;
 }
 
-.form-fields > input {
+.form-fields input {
   font-size: 1rem;
   background-color: #FFFFFF;
   margin: .8rem;
@@ -223,4 +203,9 @@ input.input-field{
   padding: .2rem;
   border: 0;
   border-radius: 1px;
+}
+
+#load-more {
+  visibility: hidden;
+  margin-bottom: 4.5rem;
 }

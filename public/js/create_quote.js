@@ -2,6 +2,12 @@ const relativeURL = '/api/quotes';
 const quoteForm = document.getElementById('quote-form');
 const quoteContainer = document.getElementById('quote-container');
 
+const renderSingleQuote = quote => {
+  const newQuote = quoteTemplate(quote.name, quote.quoteText, quote.title, quote.year);
+  quoteContainer.appendChild(newQuote);
+};
+
+// --- reusable templates for rendering quotes and error messages ---
 const quoteTemplate = (name, quoteText, title, year) => {
   const newQuote = document.createElement('div');
 
@@ -17,9 +23,14 @@ const quoteTemplate = (name, quoteText, title, year) => {
   return newQuote;  
 };
 
-const renderSingleQuote = quote => {
-  const newQuote = quoteTemplate(quote.name, quote.quoteText, quote.title, quote.year);
-  quoteContainer.appendChild(newQuote);
+const errorTemplate = (status, message) => {
+  return `<div class="error">
+          <div class="error-info">
+            <p>An error occurred when attempting your request: </p>
+            <p>Status Code: ${status}</p>
+            <p>Message: ${message}</p>
+          </div>
+        </div>`;
 };
 
 const resetFields = () => {
@@ -31,6 +42,7 @@ const resetFields = () => {
 
 quoteForm.onsubmit = e => {
   e.preventDefault();
+  quoteContainer.innerHTML = '';
   
   const { name, quoteText, title, year } = e.target;
 
@@ -43,24 +55,15 @@ quoteForm.onsubmit = e => {
 
   axios.post(relativeURL, newQuote)
     .then(response => {
-      console.log(response);
       const success = document.createElement('h3');
       success.style.lineHeight = '28px';
       success.innerHTML = `Quote was successfully added to the database! Navigate to the home-page to retrieve the quote either by name: ( ${response.data.name} ) or by id: ( ${response.data.quoteId} )!`;
+
       quoteContainer.appendChild(success);
 
       renderSingleQuote(response.data);
     })
-    .catch(error => {
-      quoteContainer.innerHTML = `
-        <div class="error">
-          <div class="error-info">
-            <p>An error occurred while attempting your request: </p>
-            <p>Status Code: ${error.response.status}</p>
-            <p>Message: ${error.response.data.error}</p>
-          </div>
-        </div>`;
-    });
+    .catch(error => quoteContainer.innerHTML = errorTemplate(error.response.status, error.response.data.error));
 
   resetFields();
 };

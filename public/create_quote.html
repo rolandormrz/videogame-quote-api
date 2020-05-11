@@ -11,7 +11,7 @@
       <h1>Videogame Quote API</h1>
       <nav>
         <ul>
-          <li><a href="index.html">Home</a></li>
+          <li><a href="index.html">Get Quotes</a></li>
           <li><a href="">Add New Quote</a></li>
           <li><a href="update_quote.html">Update Quote</a></li>
           <li><a href="delete_quote.html">Delete Quote</a></li>
@@ -19,13 +19,13 @@
       </nav>
     </header>
     <main>
-      <div id="resource-path">
+      <div id="resource-path-display">
         <h2>POST /api/quotes</h2>
       </div>
       <form id="quote-form" class="quote-form">
         <div class="form-fields">
           <label for="name">Name</label>
-          <input id="name" name="name" value="" type="text" required>
+          <input id="name" class="input-field" name="name" value="" type="text" required>
           <label for="quoteText">Quote Text</label>
           <input id="quoteText" name="quoteText" value="" type="text" required>
           <label for="title">Game Title</label>
@@ -33,7 +33,7 @@
           <label for="year">Year</label>
           <input id="year" name="year" value="" type="text" required>
         </div>
-        <button id="submit-button" class="submit-button">Send POST Request</button>
+        <button class="button-styling">Send POST Request</button>
       </form>
       <div id="quote-container">
       </div>
