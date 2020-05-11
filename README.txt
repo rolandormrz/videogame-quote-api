@@ -2,7 +2,7 @@ A Restful API built using Express.js and SQLite. Stores quotes made by popular v
 
 Root URL for the application is localhost:3001.
 
-Resources can be interacted by appending the URL below and using the appropriate HTTP verb.
+The available operations on the resources can be seen below:
 
 URL                     verb        functionality
 /api/quotes             GET         fetches all quote resources in the collection
